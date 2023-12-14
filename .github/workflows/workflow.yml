@@ -1,38 +1,46 @@
+# File: .github/workflows/workflow.yml
 
 on: [push]
-name: Linux_Container_Workflow
+
+name: Run Azure Login With a Service Principal Secret
 
 jobs:
-    build-and-deploy:
-        runs-on: ubuntu-latest
-        steps:
-        # checkout the repo
-        - name: 'Checkout GitHub Action'
-          uses: actions/checkout@master
+
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+    
+    - uses: azure/login@v1
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+        enable-AzPSSession: true
+    
+    - name: Azure CLI script
+      uses: azure/CLI@v1
+      with:
+        azcliversion: latest
+        inlineScript: |
+          az account show
+
+    - name: Azure PowerShell script
+      uses: azure/powershell@v1.2.0
+      with:
+        azPSVersion: "latest"
+        inlineScript: |
+          Get-AzWebApp
           
-        - name: 'Login via Azure CLI'
-          uses: azure/login@v1
-          with:
-            creds: ${{ secrets.AZURE_CREDENTIALS }}
-            allow-no-subscriptions: true
-            enable-AzPSSession: true 
-        - run: |
-              az account show --output none
-              az account set --subscription 8b798223-85c1-4bed-aabb-5380e6fa022c
-              az login --tenant 6e06e42d-6925-47c6-b9e7-9581c7ca302a
-        
-        - uses: azure/docker-login@v1
-          with:
-            login-server: dmeazopenairegistry.azurecr.io
-            username: ${{ secrets.REGISTRY_USERNAME }}
-            password: ${{ secrets.REGISTRY_PASSWORD }}
-        - run: |
+    - uses: azure/docker-login@v1
+      with:
+        login-server: dmeazopenairegistry.azurecr.io
+        username: ${{ secrets.REGISTRY_USERNAME }}
+        password: ${{ secrets.REGISTRY_PASSWORD }}
+    - run: |
             docker build . -t dmeazopenairegistry.azurecr.io/sampleapp:${{ github.sha }}
             docker push dmeazopenairegistry.azurecr.io/sampleapp:${{ github.sha }}
 
-        - name: 'Deploy to Azure Container Instances'
-          uses: 'azure/aci-deploy@v1'
-          with:
+    - name: 'Deploy to Azure Container Instances'
+    - uses: 'azure/aci-deploy@v1'
+      with:
             resource-group: dme-openai-azresearch-resource-group
             dns-name-label: url-for-container
             image: dmeazopenairegistry.azurecr.io/sampleapp:${{ github.sha }}
