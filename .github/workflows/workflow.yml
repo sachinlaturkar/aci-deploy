@@ -16,8 +16,13 @@ jobs:
             creds: ${{ secrets.AZURE_CREDENTIALS }}
             allow-no-subscriptions: true
             enable-AzPSSession: true 
-        - run: |
-              az account show --output none
+        - name: Azure CLI script
+          uses: azure/CLI@v1
+          with:
+            azcliversion: 2.30.0
+            inlineScript: |
+              az account show
+              az storage -h
         - uses: azure/docker-login@v1
           with:
             login-server: dmeazopenairegistry.azurecr.io
