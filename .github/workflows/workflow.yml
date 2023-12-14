@@ -18,9 +18,6 @@ jobs:
             enable-AzPSSession: true 
         - run: |
               az account show --output none
-              az account set --subscription 8b798223-85c1-4bed-aabb-5380e6fa022c
-              az login --tenant 6e06e42d-6925-47c6-b9e7-9581c7ca302a
-        
         - uses: azure/docker-login@v1
           with:
             login-server: dmeazopenairegistry.azurecr.io
