@@ -20,8 +20,8 @@ jobs:
       uses: azure/docker-login@v1
       with:
        login-server: dmeazopenairegistry.azurecr.io
-       username: ${{ secrets.AZURE_USERNAME }}
-       password: ${{ secrets.AZURE_PASSWORD }}
+       username: ${{ secrets.REGISTRY_USERNAME }}
+       password: ${{ secrets.REGISTRY_PASSWORD }}
     - run: |
           docker build . -t sampleapp:${{ github.sha }}
           docker tag sampleapp:${{ github.sha }} dmeazopenairegistry.azurecr.io/sampleapp:${{ github.sha }}
@@ -34,7 +34,7 @@ jobs:
        image: dmeazopenairegistry.azurecr.io/sampleapp:${{ github.sha }}
        cpu: 1
        memory: 1
-       registry-username: ${{ secrets.AZURE_USERNAME }}
-       registry-password: ${{ secrets.AZURE_PASSWORD }}
+       registry-username: ${{ secrets.REGISTRY_USERNAME }}
+       registry-password: ${{ secrets.REGISTRY_PASSWORD }}
        name: sampleapp
        location: 'Germany West Central'
